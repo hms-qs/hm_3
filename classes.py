@@ -27,6 +27,7 @@ class Predicate:
 a = Var(1, 2);
 b = Var(0);
 
+
 pre1 = Predicate('A', 2);
 
 print(pre1.getVal())
