@@ -3,6 +3,8 @@
 # isCon {bool} 是否是常量
 class Var:
 	def __init__(self, val = ''):
+		if(val == ''):
+			return
 		self.val = val.strip();
 		if(str.isupper(val[0])):
 			self.isCon = True;
@@ -16,7 +18,9 @@ class Var:
 # name {str} 断言的名字
 # vars {list} 变量数组
 class Predicate:
-	def __init__(self, pre_str):
+	def __init__(self, pre_str = ''):
+		if(pre_str == ''):
+			return 
 		s1 = pre_str.strip().split('(');
 		s1 = [s1[0]] + s1[1].split(')');
 		s1 = [s1[0]] + s1[1].split(',');
@@ -51,7 +55,9 @@ class Predicate:
 # predicates {List} 断言数组
 # tell {func} 输入一个sentence,输出fact/空集/或者没有结果
 class Sentence:
-	def __init__(self, sen_str):
+	def __init__(self, sen_str = ''):
+		if(sen_str == ''):
+			return
 		pre_str_list = sen_str.strip().split('|');
 		self.predicates = [];
 		for pre_str in pre_str_list:
@@ -67,9 +73,9 @@ class Sentence:
 				pre_str = pre_str + ',';
 		return '{{"predicates": [{0}]}}'.format(pre_str);
 	__repr__ = __str__
-	def tell(self):
+	def tell(self, sen):
 		#Todo
-
+		print()
 # class KnowledgeBase
 # sentences {List} Sentence数组
 # ask {func} 输入一个Predicate, 输出True/False
@@ -91,4 +97,4 @@ class KnowledgeBase:
 		self.sentences = self.sentences + [sen];
 	def ask(sen):
 		#Todo
-
+		print()
