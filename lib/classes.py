@@ -89,6 +89,6 @@ class KnowledgeBase:
 	__repr__ = __str__
 	def addSen(self, sen):
 		self.sentences = self.sentences + [sen];
-	def tell(sen):
-		print('lal');
+	def ask(sen):
+		#Todo
 
