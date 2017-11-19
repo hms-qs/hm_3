@@ -1,4 +1,6 @@
-from lib.classes import Var, Predicate, Sentence, KnowledgeBase
+from lib.io import *
+from lib.classes import Var, Predicate, Sentence, KnowledgeBase;
 
-a = Var('a');
-print(a.isCon)
+
+inputs = input_file('./inputs/inputs1.txt');
+output_file(inputs['kb'], './outputs/kb.txt');

@@ -1,4 +1,6 @@
-from classes import Var, Predicate, Sentence, KnowledgeBase
+from lib.classes import Var, Predicate, Sentence, KnowledgeBase
+import json
+
 
 def input_file(file_str):
 	file = open(file_str)
@@ -18,5 +20,7 @@ def input_file(file_str):
 		'kb': kb
 	}
 
-inputs = input_file('../inputs/inputs1.txt');
-print(inputs['kb'])
+def output_file(data, file_str):
+	f = open(file_str, 'w');
+	f.write(data.__str__())
+	f.close()

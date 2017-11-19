@@ -34,6 +34,7 @@ class Predicate:
 			if(i < var_len):
 				var_str = var_str + ',';
 		return '{{"name": "{0}", "vars": [{1}], "bo": "{2}"}}'.format(self.name, var_str, self.bo);
+	__repr__ = __str__
 	def init(self, name, var_array = [], bo = 1):
 		self.name = name;
 		self.vars = [];
@@ -62,6 +63,7 @@ class Sentence:
 			if(i < pre_len):
 				pre_str = pre_str + ',';
 		return '{{"predicates": [{0}]}}'.format(pre_str);
+	__repr__ = __str__
 
 class KnowledgeBase:
 	def __init__(self, sentences = []):
@@ -76,6 +78,7 @@ class KnowledgeBase:
 			if(i < sen_len):
 				sen_str = sen_str + ',';
 		return '{{"sentences": [{0}]}}'.format(sen_str);
+	__repr__ = __str__
 	def addSen(self, sen):
 		self.sentences = self.sentences + [sen];
 	def tell(sen):
