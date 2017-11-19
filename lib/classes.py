@@ -1,6 +1,6 @@
-# 变量类
-# val 变量的值
-# isCon 是否是常量
+# class Var
+# val {str} 变量的值
+# isCon {bool} 是否是常量
 class Var:
 	def __init__(self, val = ''):
 		self.val = val.strip();
@@ -12,7 +12,9 @@ class Var:
 		return '{{"val": "{0}", "isCon": "{1}"}}'.format(self.val, self.isCon)
 	__repr__ = __str__
 
-# 断言类
+# class Predicate
+# name {str} 断言的名字
+# vars {list} 变量数组
 class Predicate:
 	def __init__(self, pre_str):
 		s1 = pre_str.strip().split('(');
@@ -44,9 +46,10 @@ class Predicate:
 			self.bo = True
 		else:
 			self.bo = False
-	def tel(pre):
-		print('lal');
 
+# class Sentence
+# predicates {List} 断言数组
+# tell {func} 输入一个sentence,输出fact/空集/或者没有结果
 class Sentence:
 	def __init__(self, sen_str):
 		pre_str_list = sen_str.strip().split('|');
@@ -64,7 +67,12 @@ class Sentence:
 				pre_str = pre_str + ',';
 		return '{{"predicates": [{0}]}}'.format(pre_str);
 	__repr__ = __str__
+	def tell(self):
+		#Todo
 
+# class KnowledgeBase
+# sentences {List} Sentence数组
+# ask {func} 输入一个Predicate, 输出True/False
 class KnowledgeBase:
 	def __init__(self, sentences = []):
 		self.sentences = sentences;
