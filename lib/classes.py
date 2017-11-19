@@ -1,3 +1,4 @@
+import copy
 # class Var
 # val {str} 变量的值
 # isCon {bool} 是否是常量
@@ -73,9 +74,30 @@ class Sentence:
 				pre_str = pre_str + ',';
 		return '{{"predicates": [{0}]}}'.format(pre_str);
 	__repr__ = __str__
+	def replace(self, pre):
+		#找到那个predicate
+		sen_tar_pre = None
+		new_sen = Sentence();
+		new_sen.predicates = copy.deepcopy(self.predicates);
+		for sen_pre in self.predicates:
+			if(sen_pre.name == pre.name):
+				sen_tar_pre = sen_pre;
+				break;
+		var_list = sen_tar_pre.vars + [];
+		var_target_list = pre.vars;
+		i = 0
+		for var in var_list:
+			for new_pre in new_sen.predicates:
+				for new_pre_var in new_pre.vars:
+					if(new_pre_var.val == var.val):
+						new_pre_var.val = var_target_list[i].val;
+			i += 1
+		return new_sen;
 	def tell(self, sen):
 		#Todo
 		print()
+s = Sentence('A(x,y,z) | B(x,y)');
+print(s.replace(Predicate('~A(Jone,Alice, Joe)')));
 # class KnowledgeBase
 # sentences {List} Sentence数组
 # ask {func} 输入一个Predicate, 输出True/False
