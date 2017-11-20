@@ -97,11 +97,11 @@ class Sentence:
 		for i in Sen.predicates:
 			for j in self.predicates:
 				##找到名字相同，正负相反的predict
-				if i.name == j.name and i.bo + j.bo == 0:
+				if i.name == j.name and ((i.bo and not j.bo) or (j.bo and not i.bo)):
 					flag = 0
 					for k in range(len(i.vars)):
 						#对应都是常量有不同，不合法
-						if i.vars[k].isCon and j.vars[k].isCon and i.vars[k].name != j.vars[k].name:
+						if i.vars[k].isCon and j.vars[k].isCon and i.vars[k].val != j.vars[k].val:
 							break
 						#存在一个常量一个变量对应，标记可以进行resolve
 						if i.vars[k].isCon or j.vars[k].isCon:
@@ -109,6 +109,7 @@ class Sentence:
 					if flag == 1:
 						#深拷贝输入的sentence对象
 						temp = copy.deepcopy(Sen)
+						pro = copy.deepcopy(self)
 						for n in range(len(i.vars)):
 							#对于predicate的同一位置的vars[n],
 							#如果这一位在可以resolve的predicate的vars中都是常量，本位置在其他的predica中不变
@@ -117,39 +118,46 @@ class Sentence:
 							#else 遍历拷贝后sentence的所有predicate
 							for m in range(len(temp.predicates)):
 								#如果当前predicate是找到的可以resolve的predicate，跳过
-								if temp.predicates[m].name == i.name or n >= len(temp.predicates[m].vars):
+								if temp.predicates[m].name == i.name:
+									loc = m
+									continue
+								if n >= len(temp.predicates[m].vars):
 									continue
 								#如果对应的自身predicate的本位制是常量，
 								#则将深拷贝的输入sentence对应predicate的相同位置也变为常量，同时isCon变为True
 								if j.vars[n].isCon:
-									temp.predicates[m].vars[n].name = j.vars[n].name
+									temp.predicates[m].vars[n].val = j.vars[n].val
 									temp.predicates[m].vars[n].isCon = j.vars[n].isCon
 
-							for l in range(len(self.predicates)):
-								if self.predicates[l].name == j.name or n >= len(self.predicates[l].vars):
+							for l in range(len(pro.predicates)):
+								if pro.predicates[l].name == j.name or n >= len(pro.predicates[l].vars):
 									continue
 								if i.vars[n].isCon:
-									pro = copy.deepcopy(self.predicates[l])
-									pro.vars[n].name = i.vars[n].name
-									pro.vars[n].isCon = i.vars[n].isCon
+									pro.predicates[l].vars[n].val = i.vars[n].val
+									pro.predicates[l].vars[n].isCon = i.vars[n].isCon
 								## 将自身的predicate修改对应值加入到深拷贝中
-								temp.predicates.append(pro)
+						for l in pro.predicates:
+							if l.name != j.name:
+								pp = copy.deepcopy(l)
+								temp.predicates.append(pp)
+							
 						#删除值name与i一样（resolve）的predicate
-						temp.predicates.remove(lambda x: x.name == i.name,temp.predicates)
+						temp.predicates.pop(loc)
+
 					#寻找合并以后的sentence中相同predicate
 						top = 0
 						repeat = []
 						for n in range(len(temp.predicates)):
 							if top == 1:
 								break
-							for m in range(n,len(temp.predicates)):
+							for m in range(n+1,len(temp.predicates)):
 								if top == 1:
 									break
 								if temp.predicates[n].name == temp.predicates[m].name:
 									count = 0
 									for l in range(len(temp.predicates[n].vars)):
 										#相同位置上的值都是常量但是不相等，则本resolve不合法退出到最外层
-										if temp.predicates[n].vars[l].isCon and temp.predicates[m].vars[l].isCon and temp.predicates[n].vars[l].name != temp.predicates[m].vars[l].name:
+										if temp.predicates[n].vars[l].isCon and temp.predicates[m].vars[l].isCon and temp.predicates[n].vars[l].val != temp.predicates[m].vars[l].val:
 											top = 1
 											break
 										#如果所有位置常量都相,即重复，则只保留一个
