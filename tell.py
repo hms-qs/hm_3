@@ -42,28 +42,28 @@ def tell(self, Sen):
 					#删除值name与i一样（resolve）的predicate
 					temp.predicates.remove(lambda x: x.name == i.name,temp.predicates)
 				#寻找合并以后的sentence中相同predicate
-				top = 0
-				repeat = []
-				for n in range(len(temp.predicates)):
-					if top == 1:
-						break
-					for m in range(n,len(temp.predicates)):
+					top = 0
+					repeat = []
+					for n in range(len(temp.predicates)):
 						if top == 1:
 							break
-						if temp.predicates[n].name == temp.predicates[m].name:
-							count = 0
-							for l in range(len(temp.predicates[n].vars)):
-								#相同位置上的值都是常量但是不相等，则本resolve不合法退出到最外层
-								if temp.predicates[n].vars[l].isCon and temp.predicates[m].vars[l].isCon and temp.predicates[n].vars[l].name != temp.predicates[m].vars[l].name:
-									top = 1
-									break
-								#如果所有位置常量都相,即重复，则只保留一个
-								if temp.predicates[n].vars[l] == temp.predicates[m].vars[l]:
-									count += 1
-							if count == len(temp.predicates[n].vars):
-								repeat.append(n)
-				for n in repeat:
-					temp.predicates.pop(n)
+						for m in range(n,len(temp.predicates)):
+							if top == 1:
+								break
+							if temp.predicates[n].name == temp.predicates[m].name:
+								count = 0
+								for l in range(len(temp.predicates[n].vars)):
+									#相同位置上的值都是常量但是不相等，则本resolve不合法退出到最外层
+									if temp.predicates[n].vars[l].isCon and temp.predicates[m].vars[l].isCon and temp.predicates[n].vars[l].name != temp.predicates[m].vars[l].name:
+										top = 1
+										break
+									#如果所有位置常量都相,即重复，则只保留一个
+									if temp.predicates[n].vars[l] == temp.predicates[m].vars[l]:
+										count += 1
+								if count == len(temp.predicates[n].vars):
+									repeat.append(n)
+					for n in repeat:
+						temp.predicates.pop(n)
 	return temp 
 
 
