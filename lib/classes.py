@@ -89,7 +89,7 @@ class Sentence:
 		for var in var_list:
 			for new_pre in new_sen.predicates:
 				for new_pre_var in new_pre.vars:
-					if(new_pre_var.val == var.val):
+					if(new_pre_var.val == var.val and not new_pre_var.isCon):
 						new_pre_var.val = var_target_list[i].val;
 			i += 1
 		return new_sen;
@@ -239,6 +239,8 @@ class KnowledgeBase:
 		self.sentences = self.sentences + [sen];
 
 	def isequal(self, sen1, sen2):
+		for i in sen1.predicates:
+			sen2 = sen2.replace(i);
 		if len(sen2.predicates) != len(sen1.predicates):
 			return False
 		else:
@@ -248,7 +250,7 @@ class KnowledgeBase:
 					if i.name == j.name and i.bo == j.bo:
 						flag = 1
 						for k in range(len(i.vars)):
-							if i.vars[k].isCon == j.vars[k].isCon and ((i.vars[k].val == j.vars[k].val and i.vars[k].isCon == True) or (i.vars[k].isCon == False)):
+							if i.vars[k].isCon == j.vars[k].isCon and i.vars[k].val == j.vars[k].val:
 								continue
 							else:
 								return False
