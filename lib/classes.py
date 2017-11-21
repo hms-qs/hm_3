@@ -237,7 +237,7 @@ class KnowledgeBase:
 	__repr__ = __str__
 	def addSen(self, sen):
 		self.sentences = self.sentences + [sen];
-'''
+
 	def isequal(self, sen1, sen2):
 		if len(sen2.predicates) != len(sen1.predicates):
 			return False
@@ -248,7 +248,7 @@ class KnowledgeBase:
 					if i.name == j.name and i.bo == j.bo:
 						flag = 1
 						for k in range(len(i.vars)):
-							if i.vars[k].isCon == j.vars[k].isCon and i.vars[k].val == j.vars[k].val:
+							if i.vars[k].isCon == j.vars[k].isCon and ((i.vars[k].val == j.vars[k].val and i.vars[k].isCon == True) or (i.vars[k].isCon == False)):
 								continue
 							else:
 								return False
@@ -256,7 +256,7 @@ class KnowledgeBase:
 				if flag == 0:
 					return False
 			return True
-'''
+
 	def ask(self, sen):
 		generate = copy.deepcopy(self)
 		new = copy.deepcopy(sen)
