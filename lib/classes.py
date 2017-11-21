@@ -93,58 +93,105 @@ class Sentence:
 						new_pre_var.val = var_target_list[i].val;
 			i += 1
 		return new_sen;
+
+	def equal(self, pre1, pre2):
+		if pre1.name == pre2.name and pre1.bo != pre2.bo:
+			for k in range(len(pre1.vars)):
+				if pre1.vars[k].val != pre2.vars[k].val:
+					if pre1.vars[k].isCon == False and pre2.vars[k].isCon ==False:
+						continue
+					else:
+						return False
+			return True
+		return False
+
 	def tell(self, Sen):
 		for i in Sen.predicates:
 			for j in self.predicates:
 				##找到名字相同，正负相反的predict
 				if i.name == j.name and ((i.bo and not j.bo) or (j.bo and not i.bo)):
 					flag = 0
+					flag1 = 0
 					for k in range(len(i.vars)):
 						#对应都是常量有不同，不合法
 						if i.vars[k].isCon and j.vars[k].isCon and i.vars[k].val != j.vars[k].val:
+							flag1 = 1
 							break
 						#存在一个常量一个变量对应，标记可以进行resolve
 						if i.vars[k].isCon or j.vars[k].isCon:
 							flag = 1
+					if flag1 == 1:
+						continue
 					if flag == 1:
 						#深拷贝输入的sentence对象
 						temp = copy.deepcopy(Sen)
 						pro = copy.deepcopy(self)
+						down = 0
 						for n in range(len(i.vars)):
-							#对于predicate的同一位置的vars[n],
-							#如果这一位在可以resolve的predicate的vars中都是常量，本位置在其他的predica中不变
+							if down == 1:
+								break
 							if i.vars[n].isCon and j.vars[n].isCon:
 								continue
-							#else 遍历拷贝后sentence的所有predicate
-							for m in range(len(temp.predicates)):
-								#如果当前predicate是找到的可以resolve的predicate，跳过
-								if temp.predicates[m].name == i.name:
-									loc = m
-									continue
-								if n >= len(temp.predicates[m].vars):
-									continue
-								#如果对应的自身predicate的本位制是常量，
-								#则将深拷贝的输入sentence对应predicate的相同位置也变为常量，同时isCon变为True
-								if j.vars[n].isCon:
-									temp.predicates[m].vars[n].val = j.vars[n].val
-									temp.predicates[m].vars[n].isCon = j.vars[n].isCon
+							if j.vars[n].isCon:
+								value = i.vars[n].val
+								for q in range(len(temp.predicates)):
+									for w in range(len(temp.predicates[q].vars)):
+										if Sen.predicates[q].vars[w].val == value:
+											if temp.predicates[q].vars[w].val == value:
+												temp.predicates[q].vars[w].val = j.vars[n].val
+												temp.predicates[q].vars[w].isCon = j.vars[n].isCon
+											elif temp.predicates[q].var[w].val == j.vars[n].isCon:
+												continue
+											else:
+												down = 1
+												break
 
-							for l in range(len(pro.predicates)):
-								if pro.predicates[l].name == j.name or n >= len(pro.predicates[l].vars):
-									continue
-								if i.vars[n].isCon:
-									pro.predicates[l].vars[n].val = i.vars[n].val
-									pro.predicates[l].vars[n].isCon = i.vars[n].isCon
-								## 将自身的predicate修改对应值加入到深拷贝中
-						for l in pro.predicates:
-							if l.name != j.name:
-								pp = copy.deepcopy(l)
-								temp.predicates.append(pp)
-							
-						#删除值name与i一样（resolve）的predicate
-						temp.predicates.pop(loc)
+							if i.vars[n].isCon:
+								value = j.vars[n].val
+								for v in range(len(pro.predicates)):
+									for y in range(len(pro.predicates[v].vars)):
+										if self.predicates[v].vars[y].val == value:
+											if pro.predicates[v].vars[y].val == value:
+												pro.predicates[v].vars[y].val = i.vars[n].val
+												pro.predicates[v].vars[y].isCon = i.vars[n].isCon
+											elif pro.predicates[v].var[y].val == i.vars[n].isCon:
+												continue
+											else:
+												down = 1
+												break
+									#pro.predicates[l].vars[n].val = i.vars[n].val
+									#pro.predicates[l].vars[n].isCon = i.vars[n].isCon
+								## 将自身的predicate修改对应值加入到深拷贝
+						print(pro)
+						print(temp)
+						st = len(temp.predicates)
+						sp = len(pro.predicates)
+						case = 0
+						locp = -1
+						loct = -1
+						for p in range(sp):
+							if case ==1:
+								break
+							for q in range(st):
+								if self.equal(pro.predicates[p],temp.predicates[q]):
+									locp = p
+									loct = q
+									case = 1
+									break
+						if loct == -1 or locp == -1:
+							break
 
-					#寻找合并以后的sentence中相同predicate
+						temp.predicates.pop(loct)
+
+
+						for i in range(sp):
+							if i != locp:
+								plus = copy.deepcopy(pro.predicates[i])
+								for g in range(len(plus.vars)):
+									if not plus.vars[g].isCon:
+										plus.vars[g].val += '0'
+								temp.predicates.append(plus)
+
 						top = 0
 						repeat = []
 						for n in range(len(temp.predicates)):
@@ -167,6 +214,7 @@ class Sentence:
 										repeat.append(n)
 						for n in repeat:
 							temp.predicates.pop(n)
+						 ##print(temp)
 						return temp
 		return 0
 
@@ -189,6 +237,64 @@ class KnowledgeBase:
 	__repr__ = __str__
 	def addSen(self, sen):
 		self.sentences = self.sentences + [sen];
-	def ask(sen):
-		#Todo
-		print()
+'''
+	def isequal(self, sen1, sen2):
+		if len(sen2.predicates) != len(sen1.predicates):
+			return False
+		else:
+			for i in sen1.predicates:
+				flag = 0
+				for j in sen2.predicates:
+					if i.name == j.name and i.bo == j.bo:
+						flag = 1
+						for k in range(len(i.vars)):
+							if i.vars[k].isCon == j.vars[k].isCon and i.vars[k].val == j.vars[k].val:
+								continue
+							else:
+								return False
+						break
+				if flag == 0:
+					return False
+			return True
+'''
+	def ask(self, sen):
+		generate = copy.deepcopy(self)
+		new = copy.deepcopy(sen)
+		new.predicates[0].bo = not new.predicates[0].bo
+		generate.addSen(new)
+		iteration = 0
+		while True:
+			##print(generate.sentences
+			size = len(generate.sentences)
+			for i in range(size):
+				for j in range(size):
+					flag = 0
+					res = generate.sentences[j].tell(generate.sentences[i])
+					print(i+1)
+					print(j+1)
+					if res == 0:
+						continue
+					else:
+						for m in generate.sentences:
+							if self.isequal(res,m):
+								flag = 1
+								break
+						if flag == 1:
+							continue
+						if len(res.predicates) == 0:
+							return True
+						else:
+							print("dasd")
+							generate.addSen(res)
+			print("haha")
+			iteration += 1
+			#print(iteration)
+			#print(size)
+			if len(generate.sentences) == size or iteration == 10000:
+				return False
+
+
+
+
+
+		
